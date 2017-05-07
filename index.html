@@ -1,9 +1,309 @@
 
 <html>
-  <title> 
-    First Website
-  </title>
-  <body>
-    <h1> My first page </h1>
-  </body>
+<head>
+	<title>
+		Dry as a Bone
+	</title>
+	<style>
+body {
+    -webkit-transform: scale(0.8);
+       -moz-transform: scale(0.8);
+            transform: scale(0.8);
+	background-color: gray;
+			}
+	
+.headline {
+	color: blue;
+	text-align: center;
+	font-size: 80px;
+	font-family: impact;
+	background-image: url("https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcQ_kZYkFzHhQC3WqaD7UGibq-FHL_SVGpmvXP-yzAUE_IUTQ30b");
+	margin-top: 0px;
+	margin-bottom: 0px;
+}
+
+#game {
+	border: solid;
+	margin-left: 650px;
+	margin-bottom: -800px;
+}
+	</style>
+	
+</head>
+
+<body>
+	
+	<h1 class="headline">
+		Dry as a Bone
+	</h1>
+	
+  
+	
+	<canvas id='game' width='1000' height='700'>
+	
+	
+	
+	
+	</canvas>
+
+	
+	
+
+
+	
+
+	
+
+	</body>
+	<script>
+	var canvas = document.getElementById('game');
+var ctx = canvas.getContext('2d');
+
+
+var WIDTH = 1000;
+var HEIGHT = 700;
+var speedRect = 200;
+var x = 0;
+var y = 680;
+var xPos = [0];
+var yPos = [0];
+var speed = [1];
+var rainDrops = 10;
+var rectWidth = 20;
+var rectHeight = 20;
+var lives = 5;
+var winX = WIDTH/2;
+var winY = HEIGHT/2;
+var winWidth = 40;
+var winLength = 40;
+var safeX = 0;
+var safeY = HEIGHT-30;
+var safeWidth = 30;
+var safeHeight = 30;
+var level = 0;
+
+
+
+
+// Handle keyboard controls
+var keysDown = {};
+
+addEventListener("keydown", function (e) {
+	keysDown[e.keyCode] = true;
+}, false);
+
+addEventListener("keyup", function (e) {
+	delete keysDown[e.keyCode];
+}, false);
+	
+// Update game objects
+var update = function (modifier) {
+	
+	if (38 in keysDown) { // Player holding up
+		y -= speedRect * modifier;
+	}
+	if (40 in keysDown) { // Player holding down
+		y += speedRect * modifier;
+	}
+	if (37 in keysDown) { // Player holding left
+		x -= speedRect * modifier;
+	}
+	if (39 in keysDown) { // Player holding right
+		x += speedRect * modifier;
+		}
+};
+
+
+	//Lock Screen
+window.addEventListener("keydown", function(e) {
+    // Lock arrow keys
+    if( [37, 38, 39, 40,].indexOf(e.keyCode) > -1) {
+        e.preventDefault();
+    }
+}, false);
+
+
+function wait(ms){
+   var start = new Date().getTime();
+   var end = start;
+   while(end < start + ms) {
+     end = new Date().getTime();
+	
+ }
+}
+
+// Level Creation
+function reset () {
+		
+	x = 0;
+	y = HEIGHT-20;
+	
+	winX = (Math.random() * WIDTH)-40 ;
+	winY = (Math.random() * HEIGHT)-40;
+	if(level === 0) {
+		winX=WIDTH/2;
+		winY=HEIGHT/2;
+	} else if (winX > WIDTH || winX < 0 || winY > HEIGHT || winY < 0) {
+		winX=WIDTH/2;
+		winY=HEIGHT/2;
+	}
+	
+	level++;
+	rainDrops+=10;
+	
+};
+
+//Safe zone
+function safeHouse () {
+	ctx.beginPath();
+	ctx.rect(safeX, safeY, safeWidth, safeHeight);
+	ctx.fillStyle = 'blue';
+	ctx.fill();
+	ctx.closePath();
+	
+};
+
+// End zone	
+function winRect () {
+	ctx.beginPath();
+	ctx.rect(winX, winY, winWidth, winLength);
+	ctx.fillStyle = 'green';
+	ctx.fill();
+	ctx.closePath();
+};
+
+//Player 
+function rectangle () {
+	ctx.beginPath();
+	ctx.rect(x, y, rectWidth, rectHeight);
+	ctx.fillStyle = 'red';
+	ctx.fill();
+	ctx.closePath();
+}
+
+	
+function rainFall () {
+
+	ctx.clearRect(0, 0, WIDTH, HEIGHT);
+	
+	//background	
+	ctx.beginPath();
+	ctx.rect(0,0, WIDTH, HEIGHT);
+	ctx.fillStyle = 'black';
+	ctx.fill();
+	ctx.closePath();	
+	
+	for (var i = 0; i < rainDrops; i++) {
+		xPos.push(Math.random()* WIDTH);
+		yPos.push(0);
+		speed.push(Math.random() * 5);
+		}
+	
+	for (var i = 0; i <rainDrops; i++) {
+		//Rain
+		ctx.beginPath();
+		ctx.arc(xPos[i], yPos[i], 3, 0, 2 * Math.PI);
+		ctx.fillStyle = 'blue';
+		ctx.fill();
+		ctx.closePath();
+	
+		//Rain movement
+		yPos[i]+=speed[i];
+	
+	//Rain Loop
+	if (yPos[i] > HEIGHT) {
+		yPos[i]= 0;
+		yPos[i]+=speed[0];
+		}
+	
+	//Sets Boundaries
+	if (x < 0){
+		x = 0;
+	}
+	if (x > WIDTH-20){
+		x = WIDTH-20;
+	}
+	if (y > HEIGHT-20){
+		y = HEIGHT-20;
+	}
+	if(y < 0) {
+		y = 0;
+	}
+	
+	//Collision detection
+	if (xPos[i]>=x && xPos[i] <= x +rectWidth && yPos[i] >= y && yPos[i] <= y + rectHeight){
+		x = 0;
+		y = HEIGHT-20;
+		lives -=1;
+		wait(1000);
+	}
+	
+	//Game Beaten
+	if (level === 11) {
+		yPos[i] = 0;			
+		speed[i] = 0;
+		ctx.beginPath();
+		ctx.font = "150px Arial";
+		ctx.fillText("YOU DID IT!!",50, HEIGHT/2);
+		ctx.fill();
+		ctx.closePath();	
+		
+	//End-zone Collision
+	}else if (x + rectWidth > winX && x + rectWidth < winX + winWidth + rectWidth && y + rectHeight > winY && y + rectHeight < winY + winLength + rectHeight){
+		reset();
+		wait(1000);
+		}	
+	//Game Over Display 
+	if (lives === 0){
+		ctx.beginPath();
+		ctx.font = "150px Arial";
+		ctx.fillText("Game Over!!!",50, HEIGHT/2);
+		ctx.fillStyle = 'red';
+		ctx.fill();	
+		ctx.closePath();
+		yPos[i] = 0;			
+		speed[i] = 0;
+		}
+	
+	//Winning Display
+	if (xPos[i] >=safeX && xPos[i] <= safeX + safeWidth && yPos[i] >= safeY && yPos[i] <= safeY +safeHeight){
+		yPos[i] = 0;
+		yPos[i] += speed[0];
+		}
+	}
+	//Screen Lives and level display
+		ctx.beginPath();
+		ctx.fillStyle = 'green';
+		ctx.font = '30px Arial';
+		ctx.fillText("You have " + lives + " lives", 10, 30);
+		ctx.fillText("Level " + level, 850, 30);
+		ctx.fill();
+		ctx.closePath();
+		
+	//Draws the safehouse, player, and endzone		
+		safeHouse();
+		rectangle();
+		winRect();	
+};
+
+//Runs the main function of rain falling and player movement
+var main = function () {
+	var now = Date.now();
+	var delta = now - then;
+
+	update(delta / 1000);
+	rainFall();
+	
+	then = now;
+
+	// Request to do this again ASAP
+	requestAnimationFrame(main);
+};
+var then = Date.now();
+
+reset();
+main();
+</script>
+	
+
 </html>
