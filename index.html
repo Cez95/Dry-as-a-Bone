@@ -6,7 +6,7 @@
 	</title>
 	<style>
 body {
-  
+ 
 	background-color: gray;
 			}
 	
@@ -17,7 +17,7 @@ body {
 	font-family: impact;
 	background-image: url("https://encrypted-tbn2.gstatic.com/images?q=tbn:ANd9GcQ_kZYkFzHhQC3WqaD7UGibq-FHL_SVGpmvXP-yzAUE_IUTQ30b");
 	margin-top: 0px;
-	margin-bottom: 0px;
+	
 }
 
 #game {
@@ -30,13 +30,13 @@ body {
 </head>
 
 <body>
-	
 	<h1 class="headline">
 		Dry as a Bone
 	</h1>
 	
+	
   
-	<p>
+	
 	<canvas id='game' width='1000' height='700'>
 	
 	
@@ -44,7 +44,7 @@ body {
 	
 	</canvas>
 
-	</p>
+	
 	
 
 
@@ -54,7 +54,9 @@ body {
 
 	</body>
 	<script>
-	var canvas = document.getElementById('game');
+	alert("Ready to begin");
+	
+var canvas = document.getElementById('game');
 var ctx = canvas.getContext('2d');
 
 
@@ -79,8 +81,21 @@ var safeY = HEIGHT-30;
 var safeWidth = 30;
 var safeHeight = 30;
 var level = 0;
+var secs = 0;
 
 
+
+
+
+//Timer
+window.onload = function() {
+
+    var id = setInterval(function(){ 
+        secs++; 
+	if(level === 11 || lives === 0)
+	clearTimeout(id);
+   }, 1000);
+};
 
 
 // Handle keyboard controls
@@ -275,6 +290,7 @@ function rainFall () {
 		ctx.font = '30px Arial';
 		ctx.fillText("You have " + lives + " lives", 10, 30);
 		ctx.fillText("Level " + level, 850, 30);
+		ctx.fillText("Time: " + secs, 450, 30);
 		ctx.fill();
 		ctx.closePath();
 		
